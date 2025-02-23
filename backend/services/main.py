@@ -44,7 +44,7 @@ class BodycamAnalysisWorkflow:
 
     def _analyze_protocol(self, frame_data, transcript):
         frame_analyses = []
-        context = ""
+        context = "" # Suneet
         if transcript and transcript != "No audio content detected in the video.":
             context = f"\n\nContext - Audio transcript: {transcript}"
         for i, frame in enumerate(frame_data):

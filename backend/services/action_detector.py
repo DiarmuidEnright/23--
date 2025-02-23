@@ -1,27 +1,36 @@
 import os
 import cv2
-import base64
 from moviepy.editor import VideoFileClip
-from google.cloud import vision_v1
-from google.cloud.vision_v1 import types
+from google.cloud import vision
 import numpy as np
 
 class ActionDetector:
     def __init__(self, api_key=None):
-        if api_key:
-            os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = api_key
-            try:
-                # Force credentials to be loaded from the file
-                self.client = vision_v1.ImageAnnotatorClient.from_service_account_json(api_key)
-            except Exception as e:
-                print(f"Error initializing Vision API client: {str(e)}")
-                raise
+        if not api_key:
+            raise ValueError("API key path is required")
+            
+        # Ensure the key file exists
+        if not os.path.exists(api_key):
+            raise FileNotFoundError(f"Google Cloud key file not found at: {api_key}")
+            
+        # Set the environment variable
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = api_key
+        
+        try:
+            # Create the client after setting environment variable
+            self.client = vision.ImageAnnotatorClient()
+        except Exception as e:
+            print(f"Error initializing Vision API client: {str(e)}")
+            raise
 
     def detect_key_moment(self, video_path):
         """
         Uses Google Cloud Vision to analyze frames and find the most active moments
         Returns list of (timestamp, score) tuples sorted by activity level
         """
+        if not os.path.exists(video_path):
+            raise FileNotFoundError(f"Video file not found at: {video_path}")
+
         video = VideoFileClip(video_path)
         fps = video.fps
         duration = video.duration
@@ -32,6 +41,8 @@ class ActionDetector:
         moments = []
         
         cap = cv2.VideoCapture(video_path)
+        if not cap.isOpened():
+            raise ValueError(f"Failed to open video file: {video_path}")
         
         for frame_num in range(0, total_frames, sample_interval):
             timestamp = frame_num / fps
@@ -42,22 +53,26 @@ class ActionDetector:
                 continue
                 
             # Encode frame for Vision API
-            _, buffer = cv2.imencode('.jpg', frame)
+            success, buffer = cv2.imencode('.jpg', frame)
+            if not success:
+                print(f"Failed to encode frame at {timestamp:.2f}s")
+                continue
             content = buffer.tobytes()
             
             try:
                 # Create image object and feature
-                image = types.Image(content=content)
+                image = vision.Image(content=content)
                 features = [
-                    types.Feature(type_=vision_v1.Feature.Type.OBJECT_LOCALIZATION),
-                    types.Feature(type_=vision_v1.Feature.Type.FACE_DETECTION)
+                    vision.Feature(type_=vision.Feature.Type.OBJECT_LOCALIZATION),
+                    vision.Feature(type_=vision.Feature.Type.FACE_DETECTION)
                 ]
-                request = types.AnnotateImageRequest(image=image, features=features)
+                request = vision.AnnotateImageRequest(image=image, features=features)
                 response = self.client.batch_annotate_images(requests=[request])
                 
                 # Get annotations
-                objects = response.responses[0].localized_object_annotations
-                faces = response.responses[0].face_annotations
+                result = response.responses[0]
+                objects = result.localized_object_annotations
+                faces = result.face_annotations
                 
                 # Calculate activity score based on:
                 # - Number of detected objects (movement/activity)
@@ -85,11 +100,4 @@ class ActionDetector:
                 print(f"Error analyzing frame at {timestamp:.2f}s: {str(e)}")
         
         cap.release()
-        
-        if not moments:
-            # If no moments detected, return middle of video with neutral score
-            return [(duration/2, 5)]
-            
-        # Sort moments by score in descending order
-        moments.sort(key=lambda x: x[1], reverse=True)
         return moments
