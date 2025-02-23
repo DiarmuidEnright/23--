@@ -1,12 +1,9 @@
-"use client";
-
 import React, { useState, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L, { Icon, LatLng } from 'leaflet';
-import customIcon from './custom-marker.png'; // Ensure tsconfig allows image imports
+import L, { Icon } from 'leaflet';
+import customIcon from '../components/custom-marker.png';
 
-// Fix for default marker icon not showing
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
@@ -22,9 +19,14 @@ function MapView() {
   const markerRef = useRef<any>(null);
 
   const myIcon: Icon = new L.Icon({
-    iconUrl: customIcon.src,
+    iconUrl: customIcon as string,
     iconSize: [38, 38],
   });
+
+  const description = "Summary of events: Act of physical violence - a gun was pulled on the police officer at time stamp: 12.34 in the body camera footage.";
+  const containsSensitiveWord = description.toLowerCase().includes("violence") || description.toLowerCase().includes("aggression");
+  const containsSecondarySensitiveWord = description.toLowerCase().includes("angry") || description.toLowerCase().includes("shouting");
+
 
   const handleUpdatePosition = () => {
     const latitude = parseFloat(lat);
@@ -55,11 +57,11 @@ function MapView() {
 
   return (
     <div style={{ position: 'relative' }}>
-      {/* 🌐 Floating Input Section */}
+      {/*  Floating Input Section */}
       <div
         style={{
           position: 'absolute',
-          top: '20px',
+          top: '10px',
           left: '50%',
           transform: 'translateX(-50%)',
           display: 'flex',
@@ -72,6 +74,9 @@ function MapView() {
           zIndex: 1000,
         }}
       >
+
+
+
         <input
           type="text"
           placeholder="Latitude"
@@ -88,6 +93,9 @@ function MapView() {
             fontSize: '1rem',
           }}
         />
+
+
+
         <input
           type="text"
           placeholder="Longitude"
@@ -104,6 +112,8 @@ function MapView() {
             fontSize: '1rem',
           }}
         />
+
+
         <button
           onClick={handleUpdatePosition}
           style={{
@@ -117,28 +127,37 @@ function MapView() {
             transition: 'background-color 0.3s ease',
           }}
         >
-          Update Location 📍
+
+
+
+          Update Marker 📍
         </button>
       </div>
 
-      {/*  Error Display */}
+      {/* Error Display */}
       {error && (
         <p style={{ color: 'red', textAlign: 'center', fontWeight: 'bold', marginTop: '80px' }}>
           {error}
         </p>
       )}
 
-      {/*  Map Section */}
+      {/* Map Section */}
       <MapContainer
         center={position}
         zoom={13}
         scrollWheelZoom={true}
-        style={{ height: '100vh', width: '100%' }}
+        style={{ height: '120vh', width: '120%' }}
       >
+
+
+
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+
+
+
         <Marker
           position={position}
           draggable={true}
@@ -148,19 +167,36 @@ function MapView() {
           icon={myIcon}
           ref={markerRef}
         >
+
+
+
           <Popup maxWidth={400}>
             <h3>BodyCam footage</h3>
             <hr />
-            {/* 🎥 Local/External Video Embed */}
             <video width="100%" height="215" controls>
-              <source src="/video2.mp4" type="video/mp4" />
+              <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
-            Summary of event:
-            Act of physical violence - a gun was pulled on the police officer at time stamp: 12.34 in the body camera footage.
+            <p>{description}</p>
             📍 Location: <strong>{position[0]}, {position[1]}</strong>
           </Popup>
         </Marker>
+        {/*Conditionally rendered - might add a second condition*/}
+        {containsSensitiveWord && (
+          <Circle
+            center={position}
+            radius={500} // 500 meters radius
+            pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: 0.3 }}
+          />
+        )}
+
+      {containsSecondarySensitiveWord && (
+          <Circle
+            center={position}
+            radius={500} // 500 meters radius
+            pathOptions={{ color: 'orange', fillColor: 'red', fillOpacity: 0.3 }}
+          />
+        )}  
       </MapContainer>
     </div>
   );
