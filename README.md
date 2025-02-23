@@ -1,42 +1,36 @@
-# **Multimodal Security Analysis Agent**  
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## **Overview**  
-Each year, over **900TB** of security footage is recorded, yet much of it is still **manually reviewed**, leading to **human error** and **missed critical events**. Our team is developing an **AI-powered multimodal analysis agent** to help **law enforcement, security teams, and public safety organizations** process and analyze vast amounts of **audio and video** footage efficiently.  
+## Getting Started
 
-By leveraging state-of-the-art AI models, our system identifies and flags **potentially critical incidents**, such as:  
-✅ **Abuse of power**  
-✅ **Excessive force**  
-✅ **Unlawful activities**  
+First, run the development server:
 
-## **Technology Stack**  
-🚀 **Backend:** Python  
-🌐 **Frontend:** TypeScript, React.js, CSS  
-🎙 **Audio Analysis:** OpenAI Whisper & OpenAI API  
-📽 **Video Analysis:** OpenAI CLIP  
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## **How It Works**  
-### 🔊 **Audio Analysis**  
-- Audio files are **converted to WVE** for structured post-analysis.  
-- OpenAI’s **Whisper** API transcribes and detects key phrases relevant to security concerns.  
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### 🎥 **Video Analysis**  
-- OpenAI **CLIP** extracts and breaks apart scenes based on **keyframes**.  
-- The system **analyzes frames** against specific search parameters to detect **anomalous behavior** and **security risks**.  
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## **What We Learned**  
-Throughout the hackathon, we encountered and overcame several challenges:  
-- **Multimodal Complexity:** Combining **audio and video analysis** efficiently required careful synchronization and computational resources.  
-- **Defining Search Parameters:** Developing a **robust filtering mechanism** to detect specific security threats took multiple iterations.  
-- **Scalability Considerations:** Processing large datasets in **real-time** demands an optimized **pipeline and cloud-based solutions** for deployment.  
-- **Bias & Ethics in AI:** Ensuring that our model **minimizes bias** and operates within **ethical guidelines** is crucial for adoption in real-world applications.  
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## **Future Improvements**  
-Moving forward, we would enhance our system by:  
-✅ **Implementing real-time processing** with GPU acceleration and cloud services.  
-✅ **Enhancing model accuracy** by integrating **fine-tuned video datasets** tailored to security scenarios.  
-✅ **Building an interactive dashboard** with live flagging and human-in-the-loop validation.  
-✅ **Expanding multilingual support** for broader accessibility in **global security operations**.  
-✅ **Integrating additional security data** like **facial recognition** (with ethical safeguards) and **pattern detection** for behavioral analysis.  
+## Learn More
 
-## **Impact**  
-By combining **multimodal AI analysis** with **real-world security needs**, our solution enhances **situational awareness**, reduces **manual workload**, and **improves response times** for critical events.  
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
